@@ -27,7 +27,7 @@ class _SideButtonState extends State<SideButton> {
           margin: EdgeInsets.symmetric(vertical: 2),
           padding: EdgeInsets.symmetric(vertical: 12, horizontal: 15),
           decoration: BoxDecoration(
-            color: isHovered ? Color(0xFF8B5E3C).withOpacity(0.8) : Colors.transparent,
+            color: isHovered ? Color.fromARGB(255, 76, 60, 139).withOpacity(0.8) : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
             boxShadow: isHovered
                 ? [
@@ -43,14 +43,14 @@ class _SideButtonState extends State<SideButton> {
             children: [
               Icon(
                 widget.icon,
-                color: isHovered ? Colors.white : Color(0xFF543A14),
+                color: isHovered ? Colors.white : Color.fromARGB(255, 76, 60, 139),
                 size: 22,
               ),
               SizedBox(width: 12),
               Text(
                 widget.label,
                 style: TextStyle(
-                  color: isHovered ? Colors.white : Color(0xFF543A14),
+                  color: isHovered ? Colors.white :  Color.fromARGB(255, 76, 60, 139),
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                   letterSpacing: 1.5,

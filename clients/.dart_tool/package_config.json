@@ -230,6 +230,12 @@
       "languageVersion": "2.19"
     },
     {
+      "name": "intl",
+      "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/intl-0.20.2",
+      "packageUri": "lib/",
+      "languageVersion": "3.3"
+    },
+    {
       "name": "jwt_decode",
       "rootUri": "file:///C:/Users/USER/AppData/Local/Pub/Cache/hosted/pub.dev/jwt_decode-0.3.1",
       "packageUri": "lib/",
@@ -578,7 +584,7 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-02-26T02:32:21.451776Z",
+  "generated": "2025-03-04T12:07:24.650361Z",
   "generator": "pub",
   "generatorVersion": "3.6.1",
   "flutterRoot": "file:///C:/src/flutter",

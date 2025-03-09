@@ -64,7 +64,7 @@ class _MyhomeState extends State<Myhome> {
           flex: 1,
           child: Container(
             decoration: BoxDecoration(
-              color:   Color.fromARGB(255, 236, 220, 157),
+              color:Color.fromRGBO(241, 243, 251, 1),
               
             ),
             child: SizedBox(
@@ -76,18 +76,18 @@ class _MyhomeState extends State<Myhome> {
                   Text("Administrator",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          color: Color(0xFF543A14),
+                          color: Color.fromARGB(255, 37, 170, 61),
                           fontSize: 25,
                           letterSpacing: 2)),
                   Image.asset(
-                    'assets/haa2.png',
+                    'assets/Home.png',
                     height: 250,
                     width: 350,
                   ),
-                  Text("Anjaly Gigi",
+                  Text("Admin Panel",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                          color: Color.fromARGB(255, 84, 58, 20),
+                          color: Color.fromARGB(255, 20, 44, 84),
                           fontSize: 20,
                           letterSpacing: 2)),
                   SizedBox(

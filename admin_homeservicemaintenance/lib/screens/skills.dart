@@ -1,5 +1,9 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:file_picker/file_picker.dart';
 
 class ManageSkills extends StatefulWidget {
   const ManageSkills({super.key});
@@ -18,6 +22,38 @@ class _ManageSkillsState extends State<ManageSkills> {
   void initState() {
     super.initState();
     fetchData();
+  }
+
+  PlatformFile? pickedImage;
+
+  // Handle File Upload Process
+  Future<void> handleImagePick() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      allowMultiple: false, // Only single file upload
+    );
+    if (result != null) {
+      setState(() {
+        pickedImage = result.files.first;
+      });
+    }
+  }
+
+  Future<String?> photoUpload() async {
+    try {
+      final bucketName = 'skill'; // Replace with your bucket name
+      final filePath = "SkillImage-${pickedImage!.name}";
+      await supabase.storage.from(bucketName).uploadBinary(
+            filePath,
+            pickedImage!.bytes!, // Use file.bytes for Flutter Web
+          );
+      final publicUrl =
+          supabase.storage.from(bucketName).getPublicUrl(filePath);
+      // await updateImage(uid, publicUrl);
+      return publicUrl;
+    } catch (e) {
+      print("Error photo upload: $e");
+      return null;
+    }
   }
 
   Future<void> fetchData() async {
@@ -42,8 +78,9 @@ class _ManageSkillsState extends State<ManageSkills> {
 
   Future<void> submit() async {
     try {
+      String? imageUrl = await photoUpload();
       await supabase.from('tbl_skills').insert([
-        {'skill_name': skills.text}
+        {'skill_name': skills.text, 'skill_image': imageUrl}
       ]);
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -76,10 +113,11 @@ class _ManageSkillsState extends State<ManageSkills> {
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: Container(
-         width: 90, // Reduce this value
-         height: 700, // Reduce this value
+        width: 90, // Reduce this value
+        height: 700, // Reduce this value
         decoration: BoxDecoration(
-          color:  Color.fromARGB(255, 255, 250, 250),
+          border: Border.all(width: 2),
+          color: Color.fromRGBO(241, 243, 251, 1),
           borderRadius: BorderRadius.circular(10),
           boxShadow: [
             BoxShadow(
@@ -97,57 +135,93 @@ class _ManageSkillsState extends State<ManageSkills> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Padding(
-                padding: const EdgeInsets.all(28.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: skills,
-                        decoration: InputDecoration(
-                          labelText: 'Skill Name',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                          enabledBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.brown, width: 1.5),
+              Row(
+                children: [
+                  Container(
+                    height: 200,
+                    width: 200,
+                    decoration: BoxDecoration(border: Border.all(width: 2)),
+                    child: pickedImage == null
+                        ? GestureDetector(
+                            onTap: handleImagePick,
+                            child: Icon(
+                              Icons.add_a_photo,
+                              color: Color(0xFF0277BD),
+                              size: 50,
+                            ),
+                          )
+                        : GestureDetector(
+                            onTap: handleImagePick,
+                            child: ClipRRect(
+                              child: pickedImage!.bytes != null
+                                  ? Image.memory(
+                                      Uint8List.fromList(
+                                          pickedImage!.bytes!), // For web
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.file(
+                                      File(pickedImage!
+                                          .path!), // For mobile/desktop
+                                      fit: BoxFit.cover,
+                                    ),
+                            ),
                           ),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.brown, width: 2),
+                  ),
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(28.0),
+                          child: TextFormField(
+                            controller: skills,
+                            decoration: InputDecoration(
+                              labelText: 'Skill Name',
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.brown, width: 1.5),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.brown, width: 2),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
+                        ElevatedButton(
+                          onPressed: submit,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.brown, // Button color
+                            foregroundColor: Colors.white, // Text color
+                            padding: EdgeInsets.symmetric(
+                                vertical: 15, horizontal: 20),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: Text("Add Skill",
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 10),
-
-                  ],
-                ),
-                
+                  ),
+                ],
               ),
-                                 ElevatedButton(
-                      onPressed: submit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.brown, // Button color
-                        foregroundColor: Colors.white, // Text color
-                        padding: EdgeInsets.symmetric(vertical: 15, horizontal: 20),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: Text("Add Skill",
-                          style:
-                              TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    ),
               SizedBox(height: 20),
 
               Divider(
                 thickness: 2,
                 color: Colors.brown,
               ),
-               SizedBox(height: 16),
-
+              SizedBox(height: 16),
               Text(
                 "List of Skills",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold,color: Colors.brown),
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.brown),
               ),
               SizedBox(height: 16),
 
@@ -155,10 +229,14 @@ class _ManageSkillsState extends State<ManageSkills> {
                 child: isLoading
                     ? Center(child: CircularProgressIndicator())
                     : ListView.builder(
-                        itemCount: skillsList.length,                
+                        itemCount: skillsList.length,
                         itemBuilder: (context, index) {
                           final skill = skillsList[index];
                           return ListTile(
+                            leading: CircleAvatar(
+                              backgroundImage:
+                                  NetworkImage(skill['skill_image'] ?? ""),
+                            ),
                             title: Text(skill['skill_name']),
                             // subtitle: Text(skill['id'].toString()),
                             trailing: IconButton(
@@ -171,11 +249,10 @@ class _ManageSkillsState extends State<ManageSkills> {
                       ),
               ),
             ],
-        ),
           ),
         ),
-      );
-    
+      ),
+    );
   }
 }
 

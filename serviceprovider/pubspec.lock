@@ -49,6 +49,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
+  awesome_colors:
+    dependency: "direct main"
+    description:
+      name: awesome_colors
+      sha256: "0ba11eafd9f462840718e87832f95d6bf78c94ae30e716240215abe6175cd5e8"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   boolean_selector:
     dependency: transitive
     description:
