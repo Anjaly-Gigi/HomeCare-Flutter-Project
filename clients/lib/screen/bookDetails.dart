@@ -1,4 +1,5 @@
 import 'package:clients/main.dart';
+import 'package:clients/screen/paymentpage.dart';
 import 'package:flutter/material.dart';
 
 class MyBooking extends StatefulWidget {
@@ -8,161 +9,166 @@ class MyBooking extends StatefulWidget {
   State<MyBooking> createState() => _MyBookingState();
 }
 
-class _MyBookingState extends State<MyBooking> {
+class _MyBookingState extends State<MyBooking> with SingleTickerProviderStateMixin {
   String? clientId;
-  List<Map<String, dynamic>> bookings = []; // List to store bookings
+  List<Map<String, dynamic>> bookings = [];
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    fetchLoggedInClientId(); // Fetch the logged-in client's ID
+    _tabController = TabController(length: 3, vsync: this);
+    fetchLoggedInClientId();
   }
 
-  // Fetch the logged-in client's ID
   Future<void> fetchLoggedInClientId() async {
-    try {
-      final user = supabase.auth.currentUser;
-      if (user != null) {
-        setState(() {
-          clientId = user.id; // Set the clientId to the logged-in user's ID
-        });
-        fetchData(); // Fetch the client's bookings after setting the ID
-      } else {
-        print('Error: No user is currently logged in.');
-      }
-    } catch (e) {
-      print('Error fetching logged-in user ID: $e');
+    final user = supabase.auth.currentUser;
+    if (user != null) {
+      setState(() {
+        clientId = user.id;
+      });
+      fetchData();
     }
   }
 
-  // Fetch the client's bookings
   void fetchData() async {
-    if (clientId == null) {
-      print('Error: Client ID is null.');
-      return;
-    }
+    if (clientId == null) return;
 
     try {
-      // Fetch data from Supabase
       final response = await supabase
           .from('tbl_request')
           .select()
           .eq('client_id', clientId!);
 
-     if (response!= null) {
-      setState(() {
-        bookings = List<Map<String, dynamic>>.from(response);
-      });
-    } else {
-      print('Error: No data found for the client ID: $clientId');
+      if (response != null) {
+        setState(() {
+          bookings = List<Map<String, dynamic>>.from(response);
+        });
+      }
+    } catch (e) {
+      print('Error fetching data: $e');
     }
-  } catch (e) {
-    print('Error fetching data: $e');
   }
-}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       appBar: AppBar(
-        title: const Text(
-          'My Bookings',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+        title: const Text('My Bookings'),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: 'Upcoming'),
+            Tab(text: 'Completed'),
+            Tab(text: 'Cancelled'),
+          ],
         ),
-        centerTitle: true,
-        backgroundColor: Colors.deepPurple,
-        elevation: 0,
       ),
-      body: bookings.isEmpty
-          ? const Center(
-              child: Text(
-                'No bookings found.',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: bookings.length,
-              itemBuilder: (context, index) {
-                final booking = bookings[index];
-                return _buildBookingCard(booking);
-              },
-            ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [
+          _buildBookingList([0, 1, 3]), // Upcoming and confirmed
+          _buildBookingList([4, 5]), // Completed
+          _buildBookingList([2]), // Cancelled
+        ],
+      ),
     );
   }
 
-  // Build a booking card
+  Widget _buildBookingList(List<int> statuses) {
+    final filteredBookings = bookings.where((b) => statuses.contains(b['status'])).toList();
+
+    return filteredBookings.isEmpty
+        ? const Center(child: Text('No bookings found.'))
+        : ListView.builder(
+            itemCount: filteredBookings.length,
+            itemBuilder: (context, index) {
+              final booking = filteredBookings[index];
+              return _buildBookingCard(booking);
+            },
+          );
+  }
+
   Widget _buildBookingCard(Map<String, dynamic> booking) {
     return Card(
+      color: Colors.white,
+      margin: const EdgeInsets.all(12),
       elevation: 5,
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.deepPurple[100]!, Colors.white],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-          borderRadius: BorderRadius.circular(15),
-        ),
-        padding: const EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Job Description
-            _buildDetailRow(Icons.work, 'Job Description', booking['description'] ?? "N/A"),
-            const SizedBox(height: 16),
+            _buildDetailRow(Icons.work, 'Job Description', booking['description'] ?? 'N/A'),
+            _buildDetailRow(Icons.calendar_today, 'Date', booking['fordate'] ?? 'N/A'),
+            _buildDetailRow(Icons.access_time, 'Time', booking['fortime'] ?? 'N/A'),
+            if (booking['status'] >= 4) ...[
+              _buildDetailRow(Icons.timer, 'Start Time', booking['starttime'] ?? 'N/A'),
+              _buildDetailRow(Icons.timer_off, 'End Time', booking['endtime'] ?? 'N/A'),
+              const SizedBox(height: 12),
+              Card(
+                color: Colors.white,
+                elevation: 3,
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Charge:', style: TextStyle(fontWeight: FontWeight.bold)),
+                          Text(booking['charge'] != null ? '\$${booking['charge']}' : 'N/A'),
+                        ],
+                      ),
+                      const Divider(),
+                      if (booking['status'] == 5)
+                        Center(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+                            ),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => PaymentGatewayScreen(bookingId: booking['id'])),
+                              );
+                            },
+                            child: const Text('Proceed to pay'),
 
-            // Date
-            _buildDetailRow(Icons.calendar_today, 'Date', booking['fordate'] ?? "N/A"),
-            const SizedBox(height: 16),
-
-            // Time
-            _buildDetailRow(Icons.access_time, 'Time', booking['fortime'] ?? "N/A"),
-            const SizedBox(height: 16),
-
-            // Status
-            _buildDetailRow(Icons.info, 'Status', 'Confirmed', statusColor: Colors.green),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  // Helper method to build a detail row
-  Widget _buildDetailRow(IconData icon, String label, String value, {Color? statusColor}) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.deepPurple),
-        const SizedBox(width: 16),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: const TextStyle(
-                color: Colors.grey,
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              value,
-              style: TextStyle(
-                color: statusColor ?? Colors.black,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-      ],
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.deepPurple),
+          const SizedBox(width: 12),
+          Text('$label: ', style: const TextStyle(fontWeight: FontWeight.bold)),
+          Expanded(child: Text(value)),
+        ],
+      ),
     );
+  }
+
+  void _payNow(int bookingId) async {
+    await supabase.from('tbl_request').update({'status': 6}).match({'id': bookingId});
+    fetchData();
   }
 }

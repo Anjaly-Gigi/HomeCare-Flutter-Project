@@ -200,6 +200,7 @@ class _BookingState extends State<Booking> {
                         ),
                         elevation: 0,
                       ),
+      
                       child: isLoading
                           ? const SizedBox(
                               height: 20,

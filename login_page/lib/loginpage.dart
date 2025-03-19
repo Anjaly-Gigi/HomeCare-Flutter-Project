@@ -26,11 +26,14 @@ class _MyloginState extends State<Mylogin> {
                     end: Alignment.bottomRight,
                     colors: [
                      
-                      const Color.fromARGB(255, 255, 255, 255),
-                       const Color.fromARGB(255, 205, 228, 246),
-                       const Color.fromARGB(255, 255, 255, 255),
-                    const Color.fromARGB(255, 205, 228, 246),
-                        const Color.fromARGB(255, 255, 255, 255),
+                      // const Color.fromARGB(255, 24, 56, 111),
+                      //  const Color.fromARGB(255, 190, 227, 255), 
+                       const Color.fromARGB(255, 182, 223, 255), 
+                       const Color.fromARGB(255, 190, 227, 255), 
+                             const Color.fromARGB(255, 182, 223, 255),
+                        //  const Color.fromARGB(255, 24, 56, 111),  
+                    
+                        
                     ],
                   ),
                 ),
@@ -178,19 +181,22 @@ class _MyloginState extends State<Mylogin> {
                     colors: [
                       
                       const Color.fromARGB(255, 255, 255, 255),
-                      const Color.fromARGB(255, 205, 228, 246),
+                     
                        const Color.fromARGB(255, 255, 255, 255),
-                        const Color.fromARGB(255, 205, 228, 246),
+                       
                       //   const Color.fromARGB(255, 255, 255, 255),
-                        const Color.fromARGB(255, 205, 228, 246)
+                       
                     ],
                   ),
+                
+                
                   image: DecorationImage(
-                    image: AssetImage('assets/img3.jpg'),
+                    image: AssetImage('assets/home1.png'),
                     fit: BoxFit.contain,
                     opacity: 0.8,
                   ),
                 ),
+               
               ),
             ),
           ],

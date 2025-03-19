@@ -53,7 +53,7 @@ class _DashBoardState extends State<DashBoard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:backgroundColor,
+      backgroundColor: backgroundColor,
       appBar: AppBar(
         title: Text(
           'Dashboard',
@@ -75,12 +75,11 @@ class _DashBoardState extends State<DashBoard> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Profile Overview Container
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
-                        color:Colors.white,
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
@@ -133,8 +132,6 @@ class _DashBoardState extends State<DashBoard> {
                       ),
                     ),
                     const SizedBox(height: 20),
-
-                    // Details and Actions Container
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(16.0),
@@ -184,48 +181,47 @@ class _DashBoardState extends State<DashBoard> {
                             label: "Phone",
                             value: spdetails["sp_contact"] ?? "No contact",
                           ),
-                          const SizedBox(height: 20),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        foregroundColor: Colors.white,
-                      ),
-                                onPressed: () {
-                                  Navigator.push(context,MaterialPageRoute(builder: (context) => Editpro()));
-                                  // Handle Edit Profile
-                                },
-                                
-                                child: const Text("Edit Profile"),
-                              ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        foregroundColor: Colors.white,
-                      ),
-                      onPressed: () {
-                         Navigator.push(context,MaterialPageRoute(builder: (context) => Requestview()));
-                        // Handle View Requests
-                      },
-                      child: const Text("View Requests"),
-                    ),
-                              
-                              ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        foregroundColor: Colors.white,
-                      ),
-                                onPressed: () {
-                                  Navigator.push(context,MaterialPageRoute(builder: (context) => passwordChange()));
-                                  // Handle Change Password
-                                },
-                                child: const Text("Change Password"),
-                              ),
-                            ],
-                          ),
                         ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => Editpro()));
+                          },
+                          child: const Text("Edit Profile"),
+                        ),
+                        const SizedBox(width: 20),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primaryColor,
+                            foregroundColor: Colors.white,
+                          ),
+                          onPressed: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => RequestView()));
+                          },
+                          child: const Text("View Requests"),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Center(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: () {
+                          Navigator.push(context, MaterialPageRoute(builder: (context) => passwordChange()));
+                        },
+                        child: const Text("Change Password"),
                       ),
                     ),
                   ],

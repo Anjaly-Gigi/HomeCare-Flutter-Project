@@ -39,7 +39,7 @@ class _MyhomeState extends State<Myhome> {
     {
       "icon": Icons.person_3,
       "label": "Service Providers",
-      "page": ManageSP(),
+      "page": ServiceProviderVerification(),
     },
     {
       "icon": Icons.reviews,

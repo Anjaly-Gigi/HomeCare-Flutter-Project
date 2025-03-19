@@ -51,7 +51,7 @@ class _ClientProfileState extends State<ClientProfile> {
       appBar: AppBar(
         title: const Text('Client Profile',style: TextStyle(color: Color.fromARGB(255, 255, 255, 255),),),
         centerTitle: true,
-        backgroundColor: Color.fromARGB(255, 123, 105, 153) ,
+        backgroundColor:const Color.fromARGB(255, 188, 143, 143),
         elevation: 0,
       ),
       body: SingleChildScrollView(
@@ -62,7 +62,7 @@ class _ClientProfileState extends State<ClientProfile> {
               height: 150,
             
               decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 123, 105, 153),
+                color: const Color.fromARGB(255, 188, 143, 143),
                 borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(60),
                   bottomRight: Radius.circular(60),
@@ -82,15 +82,18 @@ class _ClientProfileState extends State<ClientProfile> {
                     // Profile Picture
                     CircleAvatar(
                       radius: 50,
-                      backgroundColor: const Color.fromARGB(255, 188, 83, 54),
+                      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
                       child: Text(
-                        clientData['client_name'][0],
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
+  clientData.isNotEmpty && clientData['client_name'] != null
+      ? clientData['client_name'][0]
+      : '?',
+  style: const TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+    color: Color.fromARGB(255, 0, 0, 0),
+  ),
+),
+
                     ),
                     const SizedBox(height: 10),
                     // Client Name
