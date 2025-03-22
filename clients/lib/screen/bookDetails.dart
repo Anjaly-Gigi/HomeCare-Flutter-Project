@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:clients/main.dart';
 import 'package:clients/screen/paymentpage.dart';
+import 'package:clients/screen/rating.dart'; // Add this line
 import 'package:flutter/material.dart';
 
 class MyBooking extends StatefulWidget {
@@ -17,7 +20,7 @@ class _MyBookingState extends State<MyBooking> with SingleTickerProviderStateMix
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 4, vsync: this);
     fetchLoggedInClientId();
   }
 
@@ -62,6 +65,7 @@ class _MyBookingState extends State<MyBooking> with SingleTickerProviderStateMix
             Tab(text: 'Upcoming'),
             Tab(text: 'Completed'),
             Tab(text: 'Cancelled'),
+            Tab(text: 'Review'),
           ],
         ),
       ),
@@ -71,6 +75,7 @@ class _MyBookingState extends State<MyBooking> with SingleTickerProviderStateMix
           _buildBookingList([0, 1, 3]), // Upcoming and confirmed
           _buildBookingList([4, 5]), // Completed
           _buildBookingList([2]), // Cancelled
+          _buildReviewList([5, 6]), // Review
         ],
       ),
     );
@@ -89,6 +94,48 @@ class _MyBookingState extends State<MyBooking> with SingleTickerProviderStateMix
             },
           );
   }
+
+ Widget _buildReviewList(List<int> statuses) {
+  final filteredBookings = bookings.where((b) => statuses.contains(b['status'])).toList();
+
+  return filteredBookings.isEmpty
+      ? const Center(child: Text('No reviews to write.'))
+      : Column(
+          children: [
+            const SizedBox(height: 20),
+            const Text(
+              'Your feedback helps us improve.',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            Expanded(
+              child: ListView.builder(
+                itemCount: filteredBookings.length,
+                itemBuilder: (context, index) {
+                  final booking = filteredBookings[index];
+                  return Center(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.blue,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 24),
+                      ),
+                      onPressed: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => FeedbackPage()));
+                      },
+                      child: const Text('Write a Review'),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+}
+
 
   Widget _buildBookingCard(Map<String, dynamic> booking) {
     return Card(
@@ -139,7 +186,6 @@ class _MyBookingState extends State<MyBooking> with SingleTickerProviderStateMix
                               );
                             },
                             child: const Text('Proceed to pay'),
-
                           ),
                         ),
                     ],

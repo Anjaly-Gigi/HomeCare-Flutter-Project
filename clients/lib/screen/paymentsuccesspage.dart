@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:clients/screen/bookDetails.dart';
 import 'package:clients/screen/clientdashboard.dart';
 import 'package:flutter/material.dart';
 import 'package:confetti/confetti.dart';
@@ -31,7 +32,7 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
   void _navigateToDashboard() {
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => ClientDashboard()),
+      MaterialPageRoute(builder: (context) => MyBooking()),
       (Route<dynamic> route) => false, // Remove all routes
     );
   }

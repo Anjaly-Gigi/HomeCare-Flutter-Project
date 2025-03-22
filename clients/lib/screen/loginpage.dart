@@ -21,15 +21,6 @@ class _LoginScreenState extends State<Mylogin> {
   final formKey = GlobalKey<FormState>();
   bool _isVisible = true;
 
-  void _submit() {
-    if (formKey.currentState!.validate()) {
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(content: Text('Validation Successful')),
-
-      print('Validation Successful');
-    }
-  }
-
   Future<void> login() async {
     try {
       await supabase.auth

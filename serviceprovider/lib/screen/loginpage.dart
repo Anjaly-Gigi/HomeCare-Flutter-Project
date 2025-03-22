@@ -5,6 +5,7 @@ import 'package:serviceprovider/components/form_validation.dart';
 import 'package:serviceprovider/main.dart';
 import 'package:serviceprovider/screen/registrationpage.dart';
 import 'package:serviceprovider/screen/spDashboardpage.dart';
+import 'package:geolocator/geolocator.dart';
 
 class Mylogin extends StatefulWidget {
   const Mylogin({super.key});
@@ -28,13 +29,69 @@ class _LoginScreenState extends State<Mylogin> {
   Future<void> login() async {
     try {
       final authentication = await supabase.auth
-          .signInWithPassword(email: email.text, password: password.text);
-      if (authentication != null) {
+          .signInWithPassword(email: email.text, password: password.text);     
+        await _updateProviderLocation();
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => DashBoard()));
-      }
+      
     } catch (e) {
       print(e);
+    }
+  }
+
+  Future<void> _updateProviderLocation() async {
+    try {
+      // Check and request location permission
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please enable location services')),
+        );
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Location permission denied')),
+          );
+          return;
+        }
+      }
+
+      // Get current position
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      // Get the current user's ID from Supabase Auth
+      final userId = supabase.auth.currentUser?.id;
+      if (userId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('User not logged in')),
+        );
+        return;
+      }
+
+      // Upsert (insert or update) the location in Supabase
+      await supabase.from('tbl_sp').update({
+        'sp_location': {
+    'latitude': position.latitude,
+    'longitude': position.longitude,
+  },
+        // Add 'name' or other fields if needed, e.g., 'name': 'John Doe'
+      }).eq('id', supabase.auth.currentUser!.id);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Location updated successfully')),
+      );
+    } catch (e) {
+      print("Error location: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error updating location')),
+      );
     }
   }
 

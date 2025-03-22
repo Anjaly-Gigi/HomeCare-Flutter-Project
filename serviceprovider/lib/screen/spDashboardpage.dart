@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:serviceprovider/main.dart';
 import 'package:serviceprovider/screen/changepass.dart';
+import 'package:serviceprovider/screen/complaintpage.dart';
 import 'package:serviceprovider/screen/editprofile.dart';
 import 'package:serviceprovider/screen/requestview.dart';
+import 'package:serviceprovider/screen/viewComplaints.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:awesome_colors/awesome_colors.dart';
+import 'package:geolocator/geolocator.dart';
+
 
 class DashBoard extends StatefulWidget {
   const DashBoard({super.key});
 
+ 
   @override
   State<DashBoard> createState() => _DashBoardState();
 }
@@ -16,15 +22,73 @@ class DashBoard extends StatefulWidget {
 class _DashBoardState extends State<DashBoard> {
   bool isLoading = true;
   Map<String, dynamic> spdetails = {};
-  final supabase = Supabase.instance.client;
+ 
   final Color primaryColor = const Color.fromRGBO(29, 51, 74, 1);
   final Color accentColor = const Color.fromARGB(255, 86, 130, 3);
   final Color backgroundColor = Whites.signalWhite;
+
+  Future<void> _updateProviderLocation() async {
+    try {
+      // Check and request location permission
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Please enable location services')),
+        );
+        return;
+      }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Location permission denied')),
+          );
+          return;
+        }
+      }
+
+      // Get current position
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      // Get the current user's ID from Supabase Auth
+      final userId = supabase.auth.currentUser?.id;
+      if (userId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('User not logged in')),
+        );
+        return;
+      }
+
+      // Upsert (insert or update) the location in Supabase
+      await supabase.from('tbl_sp').update({
+        'sp_location': {
+    'latitude': position.latitude,
+    'longitude': position.longitude,
+  },
+        // Add 'name' or other fields if needed, e.g., 'name': 'John Doe'
+      }).eq('id', supabase.auth.currentUser!.id);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Location updated successfully')),
+      );
+    } catch (e) {
+      print("Error location: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error updating location')),
+      );
+    }
+  }
+
 
   @override
   void initState() {
     super.initState();
     fetchData();
+    _updateProviderLocation();
   }
 
   Future<void> fetchData() async {
@@ -49,6 +113,9 @@ class _DashBoardState extends State<DashBoard> {
       });
     }
   }
+
+   
+
 
   @override
   Widget build(BuildContext context) {
@@ -185,47 +252,73 @@ class _DashBoardState extends State<DashBoard> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
-                            foregroundColor: Colors.white,
-                          ),
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => Editpro()));
-                          },
-                          child: const Text("Edit Profile"),
-                        ),
-                        const SizedBox(width: 20),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
-                            foregroundColor: Colors.white,
-                          ),
-                          onPressed: () {
-                            Navigator.push(context, MaterialPageRoute(builder: (context) => RequestView()));
-                          },
-                          child: const Text("View Requests"),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
-                          foregroundColor: Colors.white,
-                        ),
-                        onPressed: () {
-                          Navigator.push(context, MaterialPageRoute(builder: (context) => passwordChange()));
-                        },
-                        child: const Text("Change Password"),
-                      ),
-                    ),
+                    Column(
+  crossAxisAlignment: CrossAxisAlignment.center,
+  children: [
+    Wrap(
+      spacing: 20, // Horizontal space between buttons
+      runSpacing: 20, // Vertical space between button rows
+      alignment: WrapAlignment.center,
+      children: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: primaryColor,
+            foregroundColor: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => Editpro()));
+          },
+          child: const Text("Edit Profile"),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: primaryColor,
+            foregroundColor: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => RequestView()));
+          },
+          child: const Text("View Requests"),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: primaryColor,
+            foregroundColor: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => passwordChange()));
+          },
+          child: const Text("Change Password"),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: primaryColor,
+            foregroundColor: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ComplaintPage()));
+          },
+          child: const Text("Report Complaint"),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: primaryColor,
+            foregroundColor: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => ViewComplaint()));
+          },
+          child: const Text("My Complaint"),
+        ),
+      ],
+    ),
+  ],
+),
+
                   ],
                 ),
+
+                
               ),
             ),
     );
@@ -269,6 +362,7 @@ class InfoRow extends StatelessWidget {
           ),
         ],
       ),
+      
     );
   }
 }

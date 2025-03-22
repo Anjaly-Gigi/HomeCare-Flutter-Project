@@ -1,8 +1,25 @@
 {
     "logs": [
         {
-            "outputFile": "com.example.clients.app-mergeDebugResources-40:/values-en-rAU/values-en-rAU.xml",
+            "outputFile": "com.example.clients.app-mergeDebugResources-45:/values-en-rAU/values-en-rAU.xml",
             "map": [
+                {
+                    "source": "C:\\Users\\USER\\.gradle\\caches\\transforms-3\\8b00399e5063b88a8d0e1e51e8cf8124\\transformed\\jetified-play-services-wallet-18.1.3\\res\\values-en-rAU\\values.xml",
+                    "from": {
+                        "startLines": "4",
+                        "startColumns": "0",
+                        "startOffsets": "206",
+                        "endColumns": "70",
+                        "endOffsets": "276"
+                    },
+                    "to": {
+                        "startLines": "49",
+                        "startColumns": "4",
+                        "startOffsets": "4755",
+                        "endColumns": "74",
+                        "endOffsets": "4825"
+                    }
+                },
                 {
                     "source": "C:\\Users\\USER\\.gradle\\caches\\transforms-3\\047aa7ddff6241681155a5178fa0e58d\\transformed\\preference-1.2.1\\res\\values-en-rAU\\values-en-rAU.xml",
                     "from": {

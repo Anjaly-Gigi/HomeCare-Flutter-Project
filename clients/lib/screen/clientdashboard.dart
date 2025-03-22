@@ -1,5 +1,6 @@
 import 'package:clients/main.dart';
 import 'package:clients/screen/clientprofilepage.dart';
+import 'package:clients/screen/nearestsp.dart';
 import 'package:clients/screen/skillselection.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -58,8 +59,9 @@ class _ClientDashboardState extends State<ClientDashboard> {
           gradient: LinearGradient(
             colors: [
               const Color(0xFFFF6F61),
-              const Color.fromARGB(255, 175, 238, 238),
+              const Color.fromARGB(255, 175, 238, 238),             
               const Color(0xFFFF6F61),
+              
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -102,7 +104,7 @@ class _ClientDashboardState extends State<ClientDashboard> {
                       },
                     child:CircleAvatar(
                       radius: 30,
-                      backgroundColor: const Color.fromARGB(255, 188, 83, 54),
+                      backgroundColor: const Color.fromARGB(255, 24, 141, 141), 
                       child: Text(
                         name.isNotEmpty ? name[0].toUpperCase() : '?',
                         style: const TextStyle(
@@ -132,6 +134,26 @@ class _ClientDashboardState extends State<ClientDashboard> {
                 ),
               ),
               const SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => Nearestsp()));
+                    
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(255, 24, 141, 141), 
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: const Text(
+                    'Search for Nearest Service Provider',
+                    style: TextStyle(fontSize: 16, color: Color.fromARGB(255, 255, 255, 255)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
               const Text("Choose a Skill",
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
@@ -157,6 +179,8 @@ class _ClientDashboardState extends State<ClientDashboard> {
                         },
                       ),
               ),
+              const SizedBox(height: 20),
+              
             ],
           ),
         ),
